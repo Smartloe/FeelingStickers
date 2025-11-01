@@ -34,22 +34,34 @@
 
 ## 🚀 快速开始
 
-### 安装依赖
+### 在线体验
+项目已部署到 GitHub Pages，点击即可体验：
+**[https://smartloe.github.io/FeelingStickers/](https://smartloe.github.io/FeelingStickers/)**
+
+### 本地运行
+
+#### 安装依赖
 
 ```bash
 npm install
 ```
 
-### 启动开发服务器
+#### 启动开发服务器
 
 ```bash
 npm run dev
 ```
 
-### 构建生产版本
+#### 构建生产版本
 
 ```bash
 npm run build
+```
+
+#### 构建 GitHub Pages 版本
+
+```bash
+npm run build:gh-pages
 ```
 
 ## 📁 项目结构
