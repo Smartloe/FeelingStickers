@@ -19,6 +19,11 @@
 
 整个动画循环无缝衔接，持续展示。
 
+## 🐶效果展示
+
+![alt text](image.png)
+![alt text](image-1.png)
+
 ## 🛠️ 技术栈
 
 - **前端框架**：React 18
