@@ -9,6 +9,14 @@
 4. 在 **Source** 部分选择 **GitHub Actions**
 5. 保存设置
 
+### 重要：设置仓库权限
+在首次部署前，需要确保仓库有正确的权限设置：
+1. 进入仓库 **Settings** → **Actions** → **General**
+2. 在 **Workflow permissions** 部分选择：
+   - ✅ Read and write permissions
+   - ✅ Allow GitHub Actions to create and approve pull requests
+3. 保存设置
+
 ### 2. 触发首次部署
 1. 推送代码到 main 分支
 ```bash
