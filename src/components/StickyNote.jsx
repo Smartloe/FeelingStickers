@@ -63,7 +63,7 @@ const StickyNote = ({
     onUpdate(note.id, { isMaximized: !note.isMaximized });
   };
 
-  if (note.isMinimized) {
+  if (note.isMinimized || note.isHidden) {
     return null;
   }
 

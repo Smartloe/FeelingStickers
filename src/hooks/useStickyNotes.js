@@ -21,31 +21,31 @@ const NOTES = [
 
 export const useStickyNotes = () => {
   const [notes, setNotes] = useState([]);
-  const [maxNotes, setMaxNotes] = useState(30);
-  const [spawnInterval, setSpawnInterval] = useState(1000); // 从2000ms改为1000ms，加快生成速度
+  const [maxNotes, setMaxNotes] = useState(40); // 设置合适的卡片数量
+  const [spawnInterval, setSpawnInterval] = useState(800);
 
   useEffect(() => {
     // 检测是否为移动设备
     const isMobile = window.innerWidth < 768;
-    setMaxNotes(isMobile ? 20 : 30);
-    setSpawnInterval(isMobile ? 1500 : 1000); // 移动设备也相应加快
+    setMaxNotes(isMobile ? 25 : 40);
+    setSpawnInterval(isMobile ? 1200 : 800);
     
-    // 初始生成5个便签
+    // 初始一次性创建所有卡片，但设置为隐藏状态
     const initialNotes = [];
-    for (let i = 0; i < 5; i++) {
-      initialNotes.push(createNote());
+    for (let i = 0; i < maxNotes; i++) {
+      initialNotes.push(createNote(true)); // 初始隐藏
     }
     setNotes(initialNotes);
 
-    // 设置定时生成便签
+    // 设置定时生成便签（用于循环阶段）
     const interval = setInterval(() => {
       addNote();
     }, spawnInterval);
 
     return () => clearInterval(interval);
-  }, [spawnInterval]);
+  }, [spawnInterval, maxNotes]);
 
-  const createNote = () => {
+  const createNote = (isHidden = false) => {
     const isMobile = window.innerWidth < 768;
     const cardWidth = isMobile ? 160 : 180;
     const cardHeight = isMobile ? 80 : 100;
@@ -61,6 +61,7 @@ export const useStickyNotes = () => {
       content: NOTES[Math.floor(Math.random() * NOTES.length)],
       isMinimized: false,
       isMaximized: false,
+      isHidden: isHidden, // 新增：控制卡片显示/隐藏
       zIndex: 1,
       createdAt: Date.now()
     };

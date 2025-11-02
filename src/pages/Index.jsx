@@ -28,7 +28,7 @@ const Index = () => {
     maxNotes
   } = useStickyNotes();
 
-  const [animationPhase, setAnimationPhase] = useState('initial'); // initial, arranging, holding, dispersing, reappearing
+  const [animationPhase, setAnimationPhase] = useState('initial'); // initial, first-heart, clear, popup, heart, clear...
 
   // 爱心形状排列函数
   const arrangeInHeartShape = () => {
@@ -61,29 +61,38 @@ const Index = () => {
     });
   };
 
-  // 散开便签到屏幕边缘
-  const disperseNotes = () => {
+  // 清屏：隐藏所有卡片
+  const clearScreen = () => {
     notes.forEach((note) => {
-      const randomX = Math.random() * (window.innerWidth - 180);
-      const randomY = Math.random() * (window.innerHeight - 100);
       updateNote(note.id, { 
-        x: randomX,
-        y: randomY,
-        opacity: 0
+        isHidden: true
       });
     });
   };
 
-  // 重新浮现便签
-  const reappearNotes = () => {
-    notes.forEach((note) => {
-      const randomX = Math.random() * (window.innerWidth - 180);
-      const randomY = Math.random() * (window.innerHeight - 100);
-      updateNote(note.id, { 
-        x: randomX,
-        y: randomY,
-        opacity: 1
-      });
+  // 逐一弹出卡片
+  const popupNotesOneByOne = (onComplete) => {
+    let poppedCount = 0;
+    const totalNotes = notes.length;
+    
+    notes.forEach((note, index) => {
+      const delay = Math.random() * 18000; // 在18秒内随机弹出
+      setTimeout(() => {
+        const randomX = Math.random() * (window.innerWidth - 180);
+        const randomY = Math.random() * (window.innerHeight - 100);
+        updateNote(note.id, { 
+          isHidden: false,
+          x: randomX,
+          y: randomY,
+          rotation: (Math.random() - 0.5) * 8
+        });
+        
+        poppedCount++;
+        // 当所有卡片都弹出后调用完成回调
+        if (poppedCount === totalNotes && onComplete) {
+          onComplete();
+        }
+      }, delay);
     });
   };
 
@@ -93,49 +102,56 @@ const Index = () => {
 
     let timer;
 
-    const startAnimationCycle = () => {
-      setAnimationPhase('arranging');
-      arrangeInHeartShape();
+    const startFirstHeartAnimation = () => {
+      setAnimationPhase('first-heart');
       
-      timer = setTimeout(() => {
-        setAnimationPhase('holding');
+      // 立即显示所有卡片并排列成爱心
+      notes.forEach((note) => {
+        updateNote(note.id, { 
+          isHidden: false
+        });
+      });
+      
+      // 快速排列成爱心
+      setTimeout(() => {
+        arrangeInHeartShape();
         
+        // 保持爱心形状3秒
         timer = setTimeout(() => {
-          setAnimationPhase('dispersing');
-          disperseNotes();
-          
-          timer = setTimeout(() => {
-            setAnimationPhase('reappearing');
-            reappearNotes();
-            
-            timer = setTimeout(() => {
-              // 重新开始循环
-              startAnimationCycle();
-            }, 1000); // 重现动画时间
-          }, 1000); // 散开动画时间
-        }, 3000); // 保持3秒
-      }, 1000); // 排列动画时间
+          startLoopAnimation();
+        }, 3000);
+      }, 100);
     };
 
-    // 开始动画循环
-    startAnimationCycle();
+    const startLoopAnimation = () => {
+      // 清屏阶段
+      setAnimationPhase('clear');
+      clearScreen();
+      
+      // 等待1秒后开始弹出卡片
+      timer = setTimeout(() => {
+        setAnimationPhase('popup');
+        popupNotesOneByOne(() => {
+          // 所有卡片都弹出后立即排列成爱心
+          setAnimationPhase('heart');
+          arrangeInHeartShape();
+          
+          // 保持爱心形状3秒
+          timer = setTimeout(() => {
+            // 重新开始循环
+            startLoopAnimation();
+          }, 3000);
+        });
+      }, 1000); // 清屏后等待1秒
+    };
+
+    // 开始首次动画
+    startFirstHeartAnimation();
 
     return () => {
       if (timer) clearTimeout(timer);
     };
   }, [notes.length]);
-
-  // 初始创建便签
-  useEffect(() => {
-    if (notes.length === 0) {
-      // 创建初始便签
-      for (let i = 0; i < 15; i++) {
-        setTimeout(() => {
-          addNote();
-        }, i * 100); // 间隔创建，形成动画效果
-      }
-    }
-  }, []);
 
   useEffect(() => {
     // 进入主页面后自动开始播放音乐
